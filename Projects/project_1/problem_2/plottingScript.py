@@ -15,6 +15,7 @@ data = np.loadtxt("problem1Data.txt")
 x = data[:, 0]
 u_x = data[:, 1]
 
+# Plotting the data
 plt.plot(x, u_x)
 plt.title("Plot of problem 2")
 plt.xlabel("x")
