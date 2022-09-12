@@ -1,4 +1,4 @@
-This directory is a solution to problem 2.
+### This directory is a solution to problem 2.
 
 
 The file "Problem2Plot.pdf", which is supposed to be the result of this problem, is included in this directory.
@@ -6,6 +6,10 @@ The file "Problem2Plot.pdf", which is supposed to be the result of this problem,
 
 Compiling and running the scripts (in a Linux terminal):
 
-g++ main.cpp -o main.exe
+	g++ main.cpp -o main.exe
 
-python3 plottingScript.py
+
+	./main.exe
+
+
+	python3 plottingScript.py
