@@ -5,12 +5,12 @@
 int main() {
 
   // Defining relevant variables
-  std::int n = 1000;
-  std::double x_min = 0.0;
-  std::double x_max = 1.0;
-  std::double v_min = 0.0;
-  std::double v_max = 0.0;
-  std::double h = (x_max - xmin) / n;
+  int n = 1000;
+  double x_min = 0.0;
+  double x_max = 1.0;
+  double v_min = 0.0;
+  double v_max = 0.0;
+  double h = (x_max - x_min) / n;
 
   // Defining relevant containers
   std::vector<double> x(n);
@@ -28,7 +28,7 @@ int main() {
 
   // Initial values
   x[0] = h;
-  std::double h_sq = h * h;
+  double h_sq = h * h;
   //b_tilde[0] = b_diag[0];
   //g_tilde[0] = f(x[0]) * h_sq;
 
@@ -38,23 +38,23 @@ int main() {
   }
 
   for (int i = 0; i < n; i++) {
-    g[i] = f( x[i] ) * h_sq;
+    g[i] = f(x[i]) * h_sq;
   }
 
   // Forward substitution
   //
   std::vector<double> b_t = calc_b_t(a_diag, b_diag, c_diag, n);
 
-  std::vector<double> g_t = calc_g_t(a_diag, b_t, n, h);
+  std::vector<double> g_t = calc_g_t(a_diag, g, b_t, c_diag, n, h, f(1));
   //
 
   // Backward substitution
   //
-  std::vector<double> v = calc_v(g_t, b_t, n);
+  std::vector<double> v = calc_v(g_t, b_t, c_diag, n);
   //
 
   // Write the results in a file.
-  void writeToFile("problem7Data.txt", v, x, n, x_min, x_max, )
+  writeToFile("problem7Data.txt", v, x, n, x_min, x_max, v_min, v_max);
 
   return 0;
 }
@@ -63,7 +63,7 @@ int main() {
 // Defining the functions
 //
 
-std::vector<double> f(double x){
+double f(double x){
   //
   // Calculating a f(x)-value
   // Arguments: x (a single value)
@@ -91,30 +91,31 @@ std::vector<double> calc_b_t(std::vector<int> a, std::vector<int> b, std::vector
   return b_tilde;
 }
 
-std::vector<double> calc_g_t(std::vector<int> a, std::vector<int> b_t, int n, double h) {
+std::vector<double> calc_g_t(std::vector<int> a, std::vector<double> g, std::vector<double> b_tilde, std::vector<int> c, int n, double h, double f_1) {
   //
   // Calculating g-tilde
-  // Arguments: a, b-tilde, n, h
+  // Arguments: a, g, b-tilde, c, n, h, f_1
 
   std::vector<double> g_tilde(n);
+  double h_sqr = h * h;
 
   // Formulars from problem 6.
   for (int i = 1; i < n; i++) {
     if (i == 1) {
-      g_tilde[i] = (h**2) * f_1;
+      g_tilde[i] = (h_sqr) * f_1;
     }
     else {
-      g_tilde[i] = b[i] - ( ( a[i] / b_tilde[i-1] ) * c[i-1]);
+      g_tilde[i] = g[i] - ( ( a[i] / b_tilde[i-1] ) * c[i-1]);
     }
   }
 
   return g_tilde;
 }
 
-std::vector<double> calc_v(std::vector<double> g_tilde, std::vector<double> b_tilde, int n) {
+std::vector<double> calc_v(std::vector<double> g_tilde, std::vector<double> b_tilde, std::vector<int> c, int n) {
   //
   // Calculating v
-  // Arguments: g_tilde, b_tilde, n
+  // Arguments: g_tilde, b_tilde, c, n
 
   std::vector<double> v(n);
 
@@ -124,14 +125,14 @@ std::vector<double> calc_v(std::vector<double> g_tilde, std::vector<double> b_ti
       v[i] = g_tilde[n-1] / b_tilde[n-1];
     }
     else {
-      v[i] = ( g_tilde[i] - ( c * v[i+1] ) ) / b_tilde[i];
+      v[i] = ( g_tilde[i] - ( c[i] * v[i+1] ) ) / b_tilde[i];
     }
   }
 
   return v;
 }
 
-void writeToFile(std::string fileName, std::vector<double> v_vec, std::vector<double> x_vec, int n){
+void writeToFile(std::string fileName, std::vector<double> v_vec, std::vector<double> x_vec, int n, double x_mn, double x_mx, double v_mn, double v_mx){
   // Adding the boundary points and writing v* and x*
   // (containers with the boundary points) in twp
   // different columns to a specified file name
