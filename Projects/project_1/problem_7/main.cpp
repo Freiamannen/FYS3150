@@ -5,7 +5,7 @@
 int main() {
 
   // Defining relevant variables
-  int n = 100;
+  int n = 100;    // Initialized for testing.
   double x_min = 0.0;
   double x_max = 1.0;
   double v_min = 0.0;
@@ -14,9 +14,7 @@ int main() {
 
   // Defining relevant containers
   std::vector<double> x(n);
-  //std::vector<double> b_tilde(n);
   std::vector<double> g(n);
-  //std::vector<double> g_tilde(n);
 
   // Defining matrix A
   // -> Defining matrix A by containers with the values
@@ -29,8 +27,6 @@ int main() {
   // Initial values
   x[0] = h;
   double h_sq = h * h;
-  //b_tilde[0] = b_diag[0];
-  //g_tilde[0] = f(x[0]) * h_sq;
 
   // Calculate x and g
   for (int i = 1; i < n; i++) {
@@ -53,7 +49,7 @@ int main() {
   std::vector<double> v = calc_v(g_t, b_t, c_diag, n);
   //
 
-  // Write the results in a file.
+  // Write the results in files.
   writeToFile("problem7Data.txt", v, x, n, x_min, x_max, v_min, v_max);
 
   return 0;
@@ -157,8 +153,8 @@ void writeToFile(std::string fileName, std::vector<double> v_vec, std::vector<do
   ofile.open(fileName);
 
   // Formating
-  int width = 12;
-  int prec = 4;
+  int width = 15;
+  int prec = 7;
 
   // Writing the values
   for (int i = 0; i < n+2; i++){

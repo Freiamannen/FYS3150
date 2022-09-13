@@ -6,8 +6,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Getting the data from data file
-# The data file is arranged with the first column for v-values, and
+# Getting the data from data files
+# The data files are arranged with the first column for v-values, and
 # the second column for the x-values
 data = np.loadtxt("problem7Data.txt")
 
