@@ -6,6 +6,8 @@ The "non-special" files are scripts for the general algorithm, while the "specia
 
 The .txt-files are meant to contain runtime results from executing the compiled codes.
 
+Compiling and running the scripts (in a Linux terminal):
+
 
     g++ main.cpp -o main.exe
     
@@ -14,3 +16,6 @@ The .txt-files are meant to contain runtime results from executing the compiled 
     ./main.exe
     
     echo "etc."
+
+
+As mentioned, the solution is incomplete; There is no compiling instructions for the "special" files yet.
