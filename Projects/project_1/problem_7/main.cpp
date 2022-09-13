@@ -5,7 +5,7 @@
 int main() {
 
   // Defining relevant variables
-  int n = 1000;
+  int n = 100;
   double x_min = 0.0;
   double x_max = 1.0;
   double v_min = 0.0;
@@ -100,12 +100,12 @@ std::vector<double> calc_g_t(std::vector<int> a, std::vector<double> g, std::vec
   double h_sqr = h * h;
 
   // Formulars from problem 6.
-  for (int i = 1; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     if (i == 1) {
       g_tilde[i] = (h_sqr) * f_1;
     }
     else {
-      g_tilde[i] = g[i] - ( ( a[i] / b_tilde[i-1] ) * c[i-1]);
+      g_tilde[i] = g[i] - ( ( a[i] / b_tilde[i-1] ) * g_tilde[i-1]);
     }
   }
 
@@ -138,8 +138,8 @@ void writeToFile(std::string fileName, std::vector<double> v_vec, std::vector<do
   // different columns to a specified file name
 
   // Produce the marked vectors
-  std::vector<double> v_mark(n+2);
-  std::vector<double> x_mark(n+2);
+  std::vector<double> v_mark(n);
+  std::vector<double> x_mark(n);
 
   v_mark[0] = v_mn;
   x_mark[0] = x_mn;
@@ -149,8 +149,8 @@ void writeToFile(std::string fileName, std::vector<double> v_vec, std::vector<do
     x_mark[i] = x_vec[i];
   }
 
-  v_mark[n+2] = v_mx;
-  x_mark[n+2] = x_mx;
+  v_mark[n-1] = v_mx;
+  x_mark[n-1] = x_mx;
 
   // Creating and opening a file
   std::ofstream ofile;
