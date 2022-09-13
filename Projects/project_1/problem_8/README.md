@@ -9,4 +9,4 @@ Compiling and running the scripts (in a Linux terminal):
 
 	python3 absoluteError.py
   
-  python3 relativeError.py
+  	python3 relativeError.py
