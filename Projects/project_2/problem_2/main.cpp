@@ -13,26 +13,23 @@ int main() {
   arma::mat A = tridiagMatGen(N, h);
 
   // Solve the matrix equation using eig_sym
-  std::vector Numerical = solveEig(A);
+  arma::vec numEigVal = solveEigVal(A, N);    // The core of the problem starts here, apparently (Trying to convert std::vector to arma::vec)
+  arma::mat numEigVec = solveEigVec(A, N);
 
   // Solve the matrix equation analytically
-  std::vector Analytical = solveEigAnalytical(N, h);
-
-  // Compare the two solutions
-  //bool comp = numAnaComp(Numerical, Analytical);
-
+  arma::vec anaEigVal = solveEigValAna(N, h);
+  arma::mat anaEigVec = solveEigVecAna(N, h);
 
   //
-  // DOING IT THE NUM FUNCTIONAL WAY (With the comp-function commented)
+  // Doing it the "non-functional" way (With the comp-function commented)
   //
-
-  arma::vec numEigVal = Numerical[0];
-  arma::vec numEigVec = Numerical[1];
-  arma::vec anaEigVal = Analytical[0];
-  arma::vec anaEigVec = Analytical[1];
 
   // Checks if the numerical solution is the same as the analytical one
-  if(numEigVal == anaEigVal) {
+  //
+
+  /*
+
+  if(numEigVal == anaEigVal) {    // This seems also to generate problems.
     if(numEigVec == anaEigVec) {
       std::cout << "The numerical and the analytical solution are the same" << '\n';
     }
@@ -41,8 +38,10 @@ int main() {
     std::cout << "The numerical and the analytical solution are *not* the same" << '\n';
     std::cout << '\n';
   }
+  */
 
   return 0;
+
 }
 
 //
@@ -63,27 +62,35 @@ arma::mat tridiagMatGen(int N, double h) {
   return A;
 }
 
-std::vector<arma::vec> solveEig(arma::mat M) {
+arma::vec solveEigVal(arma::mat M, int N) {
   // Solves A matrix times v vector = gamma times v vector
-  // Returning the eigenvalues and the eigenvectors in a container
+  // Returning the eigenvalues.
 
-  arma::vec eigenvalues;
-  arma::vec eigenvectors;
-  std::vector<arma::vec> returnVal(2);
+  arma::vec eigenvalues = arma::vec(N);
+  arma::mat eigenvectors = arma::vec(N, N);
 
   arma::eig_sym(eigenvalues, eigenvectors, M);
-  returnVal[0] = eigenvalues;
-  returnVal[1] = eigenvectors;
 
-  return returnVal;
+  return eigenvalues;
 }
 
-std::vector<arma::vec> solveEigAnalytical(int N, double h){
-  // Solves A matrix times v vector = gamma times v vector analytically
+arma::mat solveEigVec(arma::mat M, int N) {
+  // Solves A matrix times v vector = gamma times v vector
+  // Returning the eigenvectors.
+
+  arma::vec eigenvalues = arma::vec(N);
+  arma::mat eigenvectors = arma::vec(N, N);
+
+  arma::eig_sym(eigenvalues, eigenvectors, M);
+
+  return eigenvectors;
+}
+
+arma::vec solveEigValAna(int N, double h){
+  // Solves A matrix times v vector = gamma times v vector analytically.
+  // Returning the eigenvalues
 
   arma::vec eigenvalues(N-1);
-  arma::vec eigenvectors(N-1);
-  std::vector<arma::vec> returnVal(2);
 
   double a = - (1 / (h*h));
   double d = 2 / (h*h);
@@ -91,15 +98,36 @@ std::vector<arma::vec> solveEigAnalytical(int N, double h){
 
   for(int i = 1; i <= N; i++) {
     eigenvalues[i] = d + (2 * a * cos( (i * pi) / (N + 1) ));
-    eigenvectors[i] = sin( (i*i * pi) / (N + 1) );
   }
 
-  returnVal[0] = eigenvalues;
-  returnVal[1] = eigenvectors;
-
-  return returnVal;
+  return eigenvalues;
 }
 
+arma::mat solveEigVecAna(int N, double h){
+  // Solves A matrix times v vector = gamma times v vector analytically.
+  // Returning the eigenvectors
+
+  //
+  // DET JEG MÅ GJØRE: Regne ut egenvektorene og legge disse inn i en matrise
+  // ELLER: Lage liste, man da må de numeriske også det.
+  //
+
+  arma::mat eigenvectors = arma::mat(N, N);
+
+  double a = - (1 / (h*h));
+  double d = 2 / (h*h);
+  double pi = 3.1416;
+
+  for(int i = 1; i <= N; i++) {
+    std::vector<double> eigenvectorI(N); // Lager kolonnen, må nå fylle den inn og legge den til i selve matrisen.
+    for(int j = 1; j <= N; j++) {
+      eigenvectorI[j] = sin( (j*i * pi) / (N + 1) );
+    }
+    eigenvectors.col(i) = eigenvectorI;
+  }
+
+  return eigenvectors;
+}
 
 /*
 bool numAnaComp(std::vector<arma::vec> Num, std::vector<arma::vec> Ana) {
