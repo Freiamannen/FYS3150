@@ -9,23 +9,32 @@ int main() {
   double n = N + 1;
   double x_min = 0.0;
   double x_max = 1.0;
-  double h = (x_max - x_min) / n;
+  double h = (x_max - x_min) / (n);
   arma::mat A = tridiagMatGen(N, h);
 
-  // Solve the matrix equation using eig_sym
-  arma::vec numEigVal = solveEigVal(A, N);    // The core of the problem starts here, apparently (Trying to convert std::vector to arma::vec)
-  arma::mat numEigVec = solveEigVec(A, N);
+  // Initializing relevant containers
+  arma::vec eigenvaluesNum(N);
+  arma::mat eigenvectorsNum(N, N);
+  arma::vec eigenvaluesAna(N);
+  arma::mat eigenvectorsAna(N, N);
 
-  // Solve the matrix equation analytically
-  arma::vec anaEigVal = solveEigValAna(N, h);
-  arma::mat anaEigVec = solveEigVecAna(N, h);
+  // Solve the matrix equation using eig_sym and analytically
+  solveEig(A, N, eigenvaluesNum, eigenvectorsNum);
+  solveEigAna(A, N, h, eigenvaluesAna, eigenvectorsAna);
 
-  //
-  // Doing it the "non-functional" way (With the comp-function commented)
-  //
+  // Compare the results
+  arma::mat eigenvectorsNumNorm = arma::normalise(eigenvectorsNum);
+  arma::mat eigenvectorsAnaNorm = arma::normalise(eigenvectorsAna);
 
-  // Checks if the numerical solution is the same as the analytical one
-  //
+  arma::vec difEigenvalues = abs(eigenvaluesNum - eigenvaluesAna);
+  // double compEigenvectors = abs(eigenvectorsNumNorm - eigenvectorsAnaNorm);
+
+  // Debugging
+  std::cout << "Comparison result: " << "Vector distance is " << difEigenvalues;
+  std::cout << "Eigenvalues Ana: " << '\n' << eigenvaluesAna << '\n';
+  std::cout << "Eigenvalues Num: " << '\n' << eigenvaluesNum << '\n';
+
+  // BRUK AVSTAND (abs(a - b))
 
   /*
 
@@ -62,6 +71,17 @@ arma::mat tridiagMatGen(int N, double h) {
   return A;
 }
 
+void solveEig(arma::mat M, int N, arma::vec& eigenvaluesNum, arma::mat& eigenvectorsNum) {
+  // Solves A matrix times v vector = gamma times v vector
+  // Rewriting the eigenvalues- and eigenvectors containers.
+
+  arma::eig_sym(eigenvaluesNum, eigenvectorsNum, M);
+}
+
+
+/*
+
+
 arma::vec solveEigVal(arma::mat M, int N) {
   // Solves A matrix times v vector = gamma times v vector
   // Returning the eigenvalues.
@@ -85,6 +105,30 @@ arma::mat solveEigVec(arma::mat M, int N) {
 
   return eigenvectors;
 }
+
+
+*/
+
+void solveEigAna(arma::mat M, int N, double h, arma::vec& eigenvaluesAna, arma::mat& eigenvectorsAna){
+  // Solves A matrix times v vector = gamma times v vector analytically
+  // Rewriting the eigenvalues- and eigenvectors containers.
+
+  double a = - (1 / (h*h));
+  std::cout << a << '\n';
+  double d = 2 / (h*h);
+  std::cout << d << '\n';
+  double pi = 3.1416;
+
+  for(int i = 0; i <= N-1; i++) {
+    eigenvaluesAna(i) = d + (2.0 * a * std::cos( ((i+1.0) * pi) / (N + 1.0) ));
+    // Increasing
+    for(int j = 0; j <= N-1; j++) {
+      eigenvectorsAna(i, j) = std::sin( ((j+1)*(i+1) * pi) / (N + 1) );
+    }
+  }
+}
+
+/*
 
 arma::vec solveEigValAna(int N, double h){
   // Solves A matrix times v vector = gamma times v vector analytically.
@@ -128,6 +172,10 @@ arma::mat solveEigVecAna(int N, double h){
 
   return eigenvectors;
 }
+
+*/
+
+/////////////
 
 /*
 bool numAnaComp(std::vector<arma::vec> Num, std::vector<arma::vec> Ana) {
