@@ -8,7 +8,7 @@ int main() {
   int k;
   int l;
 
-  // Identifying matrix A
+  // Defining matrix A
   arma::mat A(4, 4, arma::fill::zeros);
   A(0, 0) = 1.0;
   A(1, 1) = 1.0;
@@ -24,7 +24,7 @@ int main() {
 
   // Finding the maximum value on the off-diagonal and printing it
   double maxOffDiag = max_offdiag_symmetric(A, k, l);
-  std::cout << maxOffDiag << '\n';
+  std::cout << "The maximum value (absolute) on the off diagonal: " << maxOffDiag << '\n' << '\n';
 
   return 0;
 }
