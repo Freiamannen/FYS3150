@@ -25,6 +25,6 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l);
 // Preforms a Jacobi rotation at A(k, l) to rotate away the off-diagonal element.
 // Arguments: A, R, k, l
 
-void jacobi_eigensolver(arma::mat& A, arma::mat R, double eps, arma::vec& eigenvalues, arma::mat eigenvectors, const int maxIter, int& iterations, bool& converged);
+void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::mat eigenvectors, const int maxIter, int& iterations, bool& converged);
 // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
 // Arguments: A, R, eps, eigenvalues, eigenvectors, maxIter, iterations, converged
