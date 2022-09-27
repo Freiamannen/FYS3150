@@ -1,1 +1,1 @@
-This is the README-file for problem 6
+This is the README-file for problem 6.
