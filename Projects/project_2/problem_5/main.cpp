@@ -10,7 +10,7 @@ int main() {
 
   for (int i = 0; i < N.size() - 1; i++); {
 
-    double n = N(i) + 1;
+    double n = N(i) + 1;    // Problem with compiling in this file. error: i is not defined
     double x_min = 0.0;
     double x_max = 1.0;
     double h = (x_max - x_min) / (n);
