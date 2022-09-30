@@ -11,9 +11,8 @@ int main() {
   double x_min = 0.0;
   double x_max = 1.0;
   double h = (x_max - x_min) / (n);
-  //arma::mat A = tridiagMatGen(N, h);
+  arma::mat A = tridiagMatGen(N, h);
 
-  arma::mat A(N, N, arma::fill::randu);
 
   double epsilon = 1e-8;
   arma::vec eigenvalues(N);
@@ -22,13 +21,24 @@ int main() {
   int iterations;
   bool converged = false;
 
+  std::cout << "--- Analytical results ---" << std::endl;
+  arma::vec ana_eigval;
+  arma::mat ana_eigvec;
+  arma::eig_sym(ana_eigval, ana_eigvec, A);
+  std::cout << "Eigenvalues: " << '\n';
+  ana_eigval.print(std::cout);
+  std::cout << "Eigenvectors: " << '\n';
+  ana_eigvec.print(std::cout);
 
   jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
 
+  std::cout << "--- Numerical results ---" << std::endl;
   std::cout << "Eigenvalues: " << '\n';
   eigenvalues.print(std::cout);
   std::cout << "Eigenvectors: " << '\n';
   eigenvectors.print(std::cout);
+
+
 
   //std::cout << "R matrix (I): " << '\n';
   //R.print();
@@ -92,21 +102,21 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
   // - Modifies the input matrices A and R
 
   // Initialize variables
-  double tau;
-  double tang;
-  double cosi;
-  double sinu;
+  double tau = 0;
+  double tang = 0;
+  double cosi = 0;
+  double sinu = 0;
 
   double N = A.n_rows;
 
   // Define the variables
-  tau = ( A(1, 1) -  A(k, k) ) / ( 2 * A(k, l) );
+  tau = ( A(l, l) -  A(k, k) ) / ( 2.0 * A(k, l) );
 
-  if (tau > 0) {
-    tang = 1.0 / ( tau + std::sqrt(1 + tau*tau) );
+  if (tau >= 0) {
+    tang = 1.0 / ( tau + std::sqrt(1.0 + tau*tau) );
   }
   else {
-    tang = -1.0 / ( -tau + std::sqrt(1 + tau*tau) );
+    tang = -1.0 / ( -tau + std::sqrt(1.0 + tau*tau) );
   }
   cosi = 1.0 / std::sqrt(1 + tang*tang);
   sinu = cosi * tang;
@@ -123,32 +133,31 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
   A(l, k) = 0.;
   // Rest of the row and column
   for (int i = 0; i <= N - 1; i++) {
-    if (i != k && i != 1){
+    if((i != k) && (i != l)){
       // m:
       double a_ik_m = A(i, k);
       double a_il_m = A(i, l);
       // m+1:
       A(i, k) = ( a_ik_m * cosi ) - ( a_il_m * sinu );
       A(k, i) = A(i, k);
-      A(i, l) = ( a_il_m * cosi ) - ( a_ik_m * sinu );
+      A(i, l) = ( a_il_m * cosi ) + ( a_ik_m * sinu );
       A(l, i) = A(i, l);
     }
-  }
 
-  for (int i = 0; i <= N - 1; i++) {
-  // Update the rotation matrix R
-    // m
     double r_ik_m = R(i, k);
     double r_il_m = R(i, l);
     // m+1
     R(i, k) = ( r_ik_m * cosi ) - ( r_il_m * sinu );
     R(i, l) = ( r_il_m * cosi ) + ( r_ik_m * sinu );
+    
   }
+
 }
 
-void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::mat eigenvectors, const int maxIter, int& iterations, bool& converged) {
-  // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
+  // jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
 
+void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::mat& eigenvectors, const int maxIter, int& iterations, bool& converged) {
+  // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
   // Finding the largest off-diagonal element initially
   int k;
   int l;
@@ -156,14 +165,13 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
   // making the R-matrix
   arma::mat R = arma::mat(A.n_rows, A.n_cols, arma::fill::eye);
   std::cout << "Initial R matrix (I): " << '\n';
-  R.print();
+  // R.print();
   std::cout << '\n';
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
   while(!converged) {
     double maxVal = max_offdiag_symmetric(A, k, l);
-
     jacobi_rotate(A, R, k, l);
     iterations++;
 
