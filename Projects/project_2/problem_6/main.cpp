@@ -1,4 +1,4 @@
-// Code taken from problem 3, modified and built upon.
+// Code taken from problem 4, modified and built upon.
 
 // Including the header file.
 //# include "../utils.hpp"
@@ -7,44 +7,57 @@
 // Defining the main function.
 int main() {
 
-  int N = 6;
-  double n = N + 1;
-  double x_min = 0.0;
-  double x_max = 1.0;
-  double h = (x_max - x_min) / (n);
-  arma::mat A = tridiagMatGen(N, h);
+  // adding the boundary conditions
+
+  arma::vec N_matrix = {9, 99}; // Making n = {10, 100}
+
+  for (int i = 0; i < N_matrix.size(); i++) {
+
+    // Defining the system
+    double n = N_matrix(i) + 1;
+    double x_min = 0.0;
+    double x_max = 1.0;
+    double h = (x_max - x_min) / (n);
+
+    arma::mat A = tridiagMatGen(N_matrix(i), h);
+
+    double epsilon = 1e-8;
+    arma::vec eigenvalues(N_matrix(i));
+    arma::mat eigenvectors(N_matrix(i), N_matrix(i));
+    int maxIter = 100000;
+    int iterations;
+    bool converged = false;
+
+    //std::cout << "--- Analytical results ---" << std::endl;
+    arma::vec ana_eigval;
+    arma::mat ana_eigvec;
+    arma::eig_sym(ana_eigval, ana_eigvec, A);
+    //std::cout << "Eigenvalues: " << '\n';
+    //ana_eigval.print(std::cout);
+    //std::cout << "Eigenvectors: " << '\n';
+    //ana_eigvec.print(std::cout);
+
+    // Writing the analytical file
+    std::string fileAna = "analytical_n_" + std::to_string(int(N_matrix(i)+1)) + ".txt";
+    writeToFile(ana_eigval, ana_eigvec, fileAna);
+
+    jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
+
+    // Writing the numerical file
+    std::string fileNum = "numerical_n_" + std::to_string(int(N_matrix(i)+1)) + ".txt";
+    writeToFile(eigenvalues, eigenvectors, fileNum);
+
+    //std::cout << "--- Numerical results ---" << std::endl;
+    //std::cout << "Eigenvalues: " << '\n';
+    //eigenvalues.print(std::cout);
+    //std::cout << "Eigenvectors: " << '\n';
+    //eigenvectors.print(std::cout);
+
+    // Writing the results to a file.
+    // Finding the three lowest eigenvalues and its eigenvectors and appending it to the file.
 
 
-  double epsilon = 1e-8;
-  arma::vec eigenvalues(N);
-  arma::mat eigenvectors(N, N);
-  int maxIter = 100000;
-  int iterations;
-  bool converged = false;
-
-  std::cout << "--- Analytical results ---" << std::endl;
-  arma::vec ana_eigval;
-  arma::mat ana_eigvec;
-  arma::eig_sym(ana_eigval, ana_eigvec, A);
-  std::cout << "Eigenvalues: " << '\n';
-  ana_eigval.print(std::cout);
-  std::cout << "Eigenvectors: " << '\n';
-  ana_eigvec.print(std::cout);
-
-  jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
-
-  std::cout << "--- Numerical results ---" << std::endl;
-  std::cout << "Eigenvalues: " << '\n';
-  eigenvalues.print(std::cout);
-  std::cout << "Eigenvectors: " << '\n';
-  eigenvectors.print(std::cout);
-
-
-
-  //std::cout << "R matrix (I): " << '\n';
-  //R.print();
-  //std::cout << '\n';
-
+  }
 
   return 0;
 }
@@ -165,7 +178,7 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
 
   // jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
 
-void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::mat& eigenvectors, const int maxIter, int& iterations, bool& converged) {
+void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::mat& eigenvectors, const int maxIter, int& iterations, bool& converged) {
   // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
   // Finding the largest off-diagonal element initially
   int k;
@@ -173,9 +186,9 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::m
 
   // making the R-matrix
   arma::mat R = arma::mat(A.n_rows, A.n_cols, arma::fill::eye);
-  std::cout << "Initial R matrix (I): " << '\n';
+  //std::cout << "Initial R matrix (I): " << '\n';
   // R.print();
-  std::cout << '\n';
+  //std::cout << '\n';
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
@@ -189,10 +202,37 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::m
     }
   }
 
-  std::cout << "\n" << "~~" << "\n" << "No. iterations: " << iterations << "\n" << "~~" << "\n";
+  //std::cout << "\n" << "~~" << "\n" << "No. iterations: " << iterations << "\n" << "~~" << "\n";
 
   // Gathering data
   eigenvalues = A.diag();
   eigenvectors = R;
 
+}
+
+void writeToFile(arma::vec eigenvalues, arma::mat eigenvectors, std::string filename) {
+  // Finding the three eigenvectors corresponing to the three lowest eigenvalues, and writing them to a file
+
+  int N = eigenvalues.size();
+
+  // Find the eigenvectors of interest and arranging the writing
+  arma::mat B = arma::mat(N + 2, 4);
+  arma::vec x_hat = arma::linspace(0, 1, N + 2);
+  arma::uvec indices = arma::sort_index(eigenvalues); // Sorting from lowest to highest
+
+  B.col(0) = x_hat;
+  for (int i = 1; i <= 3; i++) {
+    B(arma::span(1, N), i) = eigenvectors.col(indices(i));
+  }
+
+  // Writing to file
+  // Opening files where the data is being appended
+  std::ofstream outfile;
+  outfile.open(filename);
+
+  outfile // B
+          << B
+          // end of line
+          << std::endl;
+  outfile.close();
 }
