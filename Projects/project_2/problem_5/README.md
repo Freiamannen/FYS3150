@@ -4,7 +4,11 @@ Compiling and running the scripts (in a Linux terminal):
 
 	g++ main.cpp -o main.exe -larmadillo
 
-  (There are currently some known bugs which are not yet fixed)
-
 
 	./main.exe
+
+
+	python3 plottingScript.py
+
+
+This makes a pdf and an image of a "log-scatter" of the iterations as a function of the matrix length.

@@ -7,6 +7,4 @@ Compiling and running the scripts (in a Linux terminal):
 
 	./main.exe
 
-This outputs the initial R-matrix (for debugging), number of iterations, the eigenvalues and the eigenvectors.
-
-The results are commented in the pdf provided.
+This outputs number of iterations the numerical approach does, the eigenvalues and the eigenvectors both numerical and analytical.
