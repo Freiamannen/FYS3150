@@ -10,7 +10,6 @@ int main() {
   arma::vec N_matrix = {9, 99}; // Making n = {10, 100}
 
   for (int i = 0; i < N_matrix.size(); i++) {
-
     // Defining the system
     double n = N_matrix(i) + 1;
     double x_min = 0.0;
@@ -41,7 +40,6 @@ int main() {
     // Writing the numerical file
     std::string fileNum = "numerical_n_" + std::to_string(int(N_matrix(i)+1)) + ".txt";
     writeToFile(eigenvalues, eigenvectors, fileNum);
-
   }
 
   return 0;
@@ -148,12 +146,8 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
     // m+1
     R(i, k) = ( r_ik_m * cosi ) - ( r_il_m * sinu );
     R(i, l) = ( r_il_m * cosi ) + ( r_ik_m * sinu );
-
   }
-
 }
-
-  // jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
 
 void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::mat& eigenvectors, const int maxIter, int& iterations, bool& converged) {
   // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
@@ -163,9 +157,6 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
 
   // making the R-matrix
   arma::mat R = arma::mat(A.n_rows, A.n_cols, arma::fill::eye);
-  //std::cout << "Initial R matrix (I): " << '\n';
-  // R.print();
-  //std::cout << '\n';
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
@@ -179,12 +170,9 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
     }
   }
 
-  //std::cout << "\n" << "~~" << "\n" << "No. iterations: " << iterations << "\n" << "~~" << "\n";
-
   // Gathering data
   eigenvalues = A.diag();
   eigenvectors = R;
-
 }
 
 void writeToFile(arma::vec eigenvalues, arma::mat eigenvectors, std::string filename) {

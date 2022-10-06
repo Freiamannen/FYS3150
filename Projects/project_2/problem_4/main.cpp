@@ -39,23 +39,8 @@ int main() {
   std::cout << "Eigenvectors: " << '\n';
   eigenvectors.print(std::cout);
 
-
-
-  //std::cout << "R matrix (I): " << '\n';
-  //R.print();
-  //std::cout << '\n';
-
-
   return 0;
 }
-
-
-
-
-
-
-
-
 
 //
 // Defining the functions
@@ -163,8 +148,6 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
 
 }
 
-  // jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
-
 void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::mat& eigenvectors, const int maxIter, int& iterations, bool& converged) {
   // Converging the eigenvalues and eigenvectors using the jacobi_rotate-function.
   // Finding the largest off-diagonal element initially
@@ -173,9 +156,6 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues,arma::m
 
   // making the R-matrix
   arma::mat R = arma::mat(A.n_rows, A.n_cols, arma::fill::eye);
-  std::cout << "Initial R matrix (I): " << '\n';
-  // R.print();
-  std::cout << '\n';
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.

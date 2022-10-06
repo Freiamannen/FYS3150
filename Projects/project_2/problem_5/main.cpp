@@ -10,23 +10,22 @@ int main() {
   std::ofstream outfile;
   outfile.open("N_Iteration_comparison.txt");
 
+  // Defining N
   arma::vec N_matrix = {5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25};
 
   for (int i = 0; i < N_matrix.size(); i++) {
 
-    double n = N_matrix(i) + 1;    // Problem with compiling in this file. error: i is not defined
+    double n = N_matrix(i) + 1;
     double x_min = 0.0;
     double x_max = 1.0;
     double h = (x_max - x_min) / (n);
 
     // Dense matrix
-    //arma::mat A = arma::mat(N_matrix(i), N_matrix(i)).randn();
-    //A = arma::symmatu(A);
+    // arma::mat A = arma::mat(N_matrix(i), N_matrix(i)).randn();
+    // A = arma::symmatu(A);
 
     // tridiagonal matrix
     arma::mat A = tridiagMatGen(N_matrix(i), h);
-
-    //arma::mat A(N, N, arma::fill::randu);
 
     double epsilon = 1e-5;
     arma::vec eigenvalues(N_matrix(i));
@@ -39,11 +38,10 @@ int main() {
 
     std::cout << "N = " << N_matrix(i) << '\n';
     std::cout << "--> Iterations: " << iterations << '\n' << '\n';
-
   }
 
+  // Closing file
   outfile.close();
-
 
   return 0;
 }
@@ -165,15 +163,11 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
 
   // making the R-matrix
   arma::mat R = arma::mat(A.n_rows, A.n_cols, arma::fill::eye);
-  std::cout << "Initial R matrix (I): " << '\n';
-  R.print();
-  std::cout << '\n';
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
-  double maxVal;
   while(!converged) {
-    maxVal = max_offdiag_symmetric(A, k, l);
+    double maxVal = max_offdiag_symmetric(A, k, l);
 
     jacobi_rotate(A, R, k, l);
     iterations++;
@@ -182,14 +176,12 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
       converged = true;
     }
   }
-  std::cout << "Maxval:" << maxVal << '\n';
 
   std::cout << "\n" << "~~" << "\n" << "No. iterations: " << iterations << "\n" << "~~" << "\n";
 
   // Gathering data
   eigenvalues = A.diag();
   eigenvectors = R;
-
 }
 
 void jacobi_eigensolver_p5(arma::mat& A, double eps, const int maxIter, int& iterations, bool& converged, std::ofstream& outfile) {
@@ -219,13 +211,10 @@ void jacobi_eigensolver_p5(arma::mat& A, double eps, const int maxIter, int& ite
   std::cout << "Maxval" << maxVal << '\n';
 
   // Writing data to file
-
   outfile // N
           << std::setw(10) << std::scientific << N
           // No. iterations
           << std::setw(10) << std::scientific << iterations
           // end of line
           << std::endl;
-
-
 }
