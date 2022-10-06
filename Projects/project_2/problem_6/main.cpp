@@ -7,8 +7,6 @@
 // Defining the main function.
 int main() {
 
-  // adding the boundary conditions
-
   arma::vec N_matrix = {9, 99}; // Making n = {10, 100}
 
   for (int i = 0; i < N_matrix.size(); i++) {
@@ -28,47 +26,26 @@ int main() {
     int iterations;
     bool converged = false;
 
-    //std::cout << "--- Analytical results ---" << std::endl;
+    // Analytical result
     arma::vec ana_eigval;
     arma::mat ana_eigvec;
     arma::eig_sym(ana_eigval, ana_eigvec, A);
-    //std::cout << "Eigenvalues: " << '\n';
-    //ana_eigval.print(std::cout);
-    //std::cout << "Eigenvectors: " << '\n';
-    //ana_eigvec.print(std::cout);
 
     // Writing the analytical file
     std::string fileAna = "analytical_n_" + std::to_string(int(N_matrix(i)+1)) + ".txt";
     writeToFile(ana_eigval, ana_eigvec, fileAna);
 
+    // Numerical result
     jacobi_eigensolver(A, epsilon, eigenvalues, eigenvectors, maxIter, iterations, converged);
 
     // Writing the numerical file
     std::string fileNum = "numerical_n_" + std::to_string(int(N_matrix(i)+1)) + ".txt";
     writeToFile(eigenvalues, eigenvectors, fileNum);
 
-    //std::cout << "--- Numerical results ---" << std::endl;
-    //std::cout << "Eigenvalues: " << '\n';
-    //eigenvalues.print(std::cout);
-    //std::cout << "Eigenvectors: " << '\n';
-    //eigenvectors.print(std::cout);
-
-    // Writing the results to a file.
-    // Finding the three lowest eigenvalues and its eigenvectors and appending it to the file.
-
-
   }
 
   return 0;
 }
-
-
-
-
-
-
-
-
 
 //
 // Defining the functions
@@ -222,7 +199,7 @@ void writeToFile(arma::vec eigenvalues, arma::mat eigenvectors, std::string file
 
   B.col(0) = x_hat;
   for (int i = 1; i <= 3; i++) {
-    B(arma::span(1, N), i) = eigenvectors.col(indices(i));
+    B(arma::span(1, N), i) = eigenvectors.col(indices(i - 1));
   }
 
   // Writing to file

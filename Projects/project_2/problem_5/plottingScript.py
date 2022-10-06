@@ -16,9 +16,9 @@ N = data[:, 0]
 Iterations = data[:, 1]
 
 # Plotting the data
-plt.scatter(N, Iterations)
-plt.title("Plot of problem 5")
-plt.xlabel("N")
-plt.ylabel("Iterations")
+plt.scatter(np.log(N), np.log(Iterations))
+plt.title("Log-plot of problem 5")
+plt.xlabel("Logarithm of N")
+plt.ylabel("Logarithm of Iterations")
 plt.savefig("problem5Plot.pdf")
 plt.savefig("problem5Plot.jpg")

@@ -110,7 +110,7 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
   double N = A.n_rows;
 
   // Define the variables
-  tau = ( A(1, 1) -  A(k, k) ) / ( 2 * A(k, l) );
+  tau = ( A(l, l) -  A(k, k) ) / ( 2 * A(k, l) );
 
   if (tau > 0) {
     tang = 1.0 / ( tau + std::sqrt(1 + tau*tau) );
@@ -133,14 +133,14 @@ void jacobi_rotate(arma::mat& A, arma::mat& R, int k, int l) {
   A(l, k) = 0.;
   // Rest of the row and column
   for (int i = 0; i <= N - 1; i++) {
-    if (i != k && i != 1){
+    if (i != k && i != l){
       // m:
       double a_ik_m = A(i, k);
       double a_il_m = A(i, l);
       // m+1:
       A(i, k) = ( a_ik_m * cosi ) - ( a_il_m * sinu );
       A(k, i) = A(i, k);
-      A(i, l) = ( a_il_m * cosi ) - ( a_ik_m * sinu );
+      A(i, l) = ( a_il_m * cosi ) + ( a_ik_m * sinu );
       A(l, i) = A(i, l);
     }
   }
@@ -171,8 +171,9 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
+  double maxVal;
   while(!converged) {
-    double maxVal = max_offdiag_symmetric(A, k, l);
+    maxVal = max_offdiag_symmetric(A, k, l);
 
     jacobi_rotate(A, R, k, l);
     iterations++;
@@ -181,6 +182,7 @@ void jacobi_eigensolver(arma::mat& A, double eps, arma::vec& eigenvalues, arma::
       converged = true;
     }
   }
+  std::cout << "Maxval:" << maxVal << '\n';
 
   std::cout << "\n" << "~~" << "\n" << "No. iterations: " << iterations << "\n" << "~~" << "\n";
 
@@ -203,8 +205,9 @@ void jacobi_eigensolver_p5(arma::mat& A, double eps, const int maxIter, int& ite
 
   // Preforming Jacobi rotations while counting the number of iterations
   // until the tolerance is met.
+  double maxVal;
   while(!converged) {
-    double maxVal = max_offdiag_symmetric(A, k, l);
+    maxVal = max_offdiag_symmetric(A, k, l);
 
     jacobi_rotate(A, R, k, l);
     iterations++;
@@ -213,6 +216,7 @@ void jacobi_eigensolver_p5(arma::mat& A, double eps, const int maxIter, int& ite
       converged = true;
     }
   }
+  std::cout << "Maxval" << maxVal << '\n';
 
   // Writing data to file
 
